@@ -1,3 +1,4 @@
+# === ANDROID / REACT NATIVE ANDROID ===
 # Gradle files
 .gradle/
 build/
@@ -16,7 +17,7 @@ captures/
 *.apk
 output-metadata.json
 
-# IntelliJ
+# IntelliJ / Android Studio
 *.iml
 .idea/
 misc.xml
@@ -32,3 +33,53 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+
+# === NODE / NPM / METRO / REACT NATIVE ===
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+.expo/
+.expo-shared/
+dist/
+.cache/
+metro-cache/
+*.lock
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# Build artifacts
+coverage/
+*.lcov
+
+# React Native bundle
+*.jsbundle
+
+# Watchman
+.watchmanconfig
+
+# Jest
+coverage/
+
+
+# === OS / EDITOR ===
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Linux
+*~
+
+# VSCode
+.vscode/
