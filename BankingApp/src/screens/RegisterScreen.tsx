@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 
 export default function RegisterScreen({ navigation }: any) {
   const [nickname, setNickname] = useState('');
@@ -37,21 +37,93 @@ export default function RegisterScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Create Account</Text>
 
-      <TextInput style={styles.input} placeholder="Nickname" value={nickname} onChangeText={setNickname} />
-      <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
-      <TextInput style={styles.input} placeholder="Repeat Password" secureTextEntry value={repeatPassword} onChangeText={setRepeatPassword} />
+      <TextInput
+        style={styles.input}
+        placeholder="Nickname"
+        placeholderTextColor="#888"
+        value={nickname}
+        onChangeText={setNickname}
+      />
 
-      <Button title="Register" onPress={registerUser} />
-      <Button title="Already have an account? Login" onPress={() => navigation.navigate("Login")} />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#888"
+        value={email}
+        onChangeText={setEmail}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#888"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Repeat Password"
+        placeholderTextColor="#888"
+        secureTextEntry
+        value={repeatPassword}
+        onChangeText={setRepeatPassword}
+      />
+
+      <TouchableOpacity style={styles.button} onPress={registerUser}>
+        <Text style={styles.buttonText}>Register</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+        <Text style={styles.linkText}>Already have an account? Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { fontSize: 26, marginBottom: 20, textAlign: 'center', fontWeight: 'bold' },
-  input: { borderWidth: 1, padding: 12, marginBottom: 12, borderRadius: 5 },
+  container: {
+    flex: 1,
+    backgroundColor: "#0c0f14",
+    padding: 20,
+    justifyContent: "center"
+  },
+  title: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "700",
+    marginBottom: 30,
+    textAlign: "center"
+  },
+  input: {
+    backgroundColor: "#1c1f26",
+    padding: 14,
+    marginBottom: 14,
+    borderRadius: 10,
+    color: "#fff",
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#333"
+  },
+  button: {
+    backgroundColor: "#4caf50",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600"
+  },
+  linkText: {
+    marginTop: 20,
+    color: "#4caf50",
+    fontSize: 16,
+    textAlign: "center"
+  }
 });
