@@ -1,70 +1,81 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 export default function HomeScreen({ navigation }: any) {
   const [fullName, setFullName] = useState("");
-  const [funds, setFunds] = useState("");
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const [displayFunds, setDisplayFunds] = useState("0.00");
+
+  const animateFunds = (toValue: number) => {
+    animatedValue.setValue(0);
+
+    Animated.timing(animatedValue, {
+      toValue,
+      duration: 900,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: false,
+    }).start();
+
+    animatedValue.addListener(({ value }) => {
+      setDisplayFunds(value.toFixed(2));
+    });
+  };
+
+  const loadUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axios.get("http://10.0.2.2:3000/api/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setFullName(res.data.fullName);
+      const f = Number(res.data.funds);
+      animateFunds(f);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        if (!token) return navigation.navigate("Login");
-
-        const res = await axios.get("http://10.0.2.2:3000/api/me", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        setFullName(res.data.fullName);
-        setFunds(res.data.funds);
-      } catch (err) {
-        console.log(err);
-        navigation.navigate("Login");
-      }
-    };
-
-    loadUser();
+    loadUserData();
   }, []);
 
   const logout = async () => {
     await AsyncStorage.removeItem("token");
     navigation.reset({
       index: 0,
-      routes: [{ name: "Login" }]
+      routes: [{ name: "Login" }],
     });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hello, {fullName}</Text>
-      <Text style={styles.balance}>{funds}$</Text>
+      <Text style={styles.greeting}>Hello, {fullName}</Text>
+      <Text style={styles.balance}>${displayFunds}</Text>
 
-      <View style={styles.menuContainer}>
-        <TouchableOpacity style={styles.menuButton}>
-          <Text style={styles.menuText}>Home</Text>
+      <View style={styles.menu}>
+        <TouchableOpacity style={styles.menuButton} onPress={loadUserData}>
+          <Text style={styles.menuText}>Refresh Balance</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuButton}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate("SendMoney")}>
           <Text style={styles.menuText}>Send Money</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuButton}>
-          <Text style={styles.menuText}>Spendings</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuButton}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate("Simulation")}>
           <Text style={styles.menuText}>Simulation</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.menuButton, styles.logoutButton]}
-          onPress={logout}
-        >
-          <Text style={styles.menuText}>Logout</Text>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate("Spendings")}>
+          <Text style={styles.menuText}>Spendings History</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -74,38 +85,48 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0c0f14",
     paddingHorizontal: 20,
-    paddingTop: 40
+    paddingTop: 60,
   },
-  title: {
+  greeting: {
     color: "#fff",
     fontSize: 26,
-    fontWeight: "700",
-    marginBottom: 8
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 10,
   },
   balance: {
     color: "#4caf50",
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: "700",
-    marginBottom: 40
+    textAlign: "center",
+    marginBottom: 35,
   },
-  menuContainer: {
-    gap: 15
+  menu: {
+    gap: 15,
   },
   menuButton: {
     backgroundColor: "#1c1f26",
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#333"
+    borderColor: "#333",
   },
   menuText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "600"
+    fontWeight: "600",
   },
   logoutButton: {
     marginTop: 40,
-    backgroundColor: "#b00020"
-  }
+    backgroundColor: "#b00020",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+  },
 });
