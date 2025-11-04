@@ -7,6 +7,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import SimulationScreen from './src/screens/SimulationScreen';
 import SendMoneyScreen from './src/screens/SendMoneyScreen';
 import SpendingsScreen from './src/screens/SpendingsScreen';
+import OptionsScreen from './src/screens/OptionsScreen';
 import { enableScreens } from 'react-native-screens';
 enableScreens();
 
@@ -57,6 +58,16 @@ export default function App() {
             headerTitle: "Spendings",
             headerStyle: { backgroundColor: "#0c0f14" },
             headerTintColor: "#fff"
+          }}
+        />
+        <Stack.Screen
+          name="Options"
+          component={OptionsScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "Options",
+            headerStyle: { backgroundColor: "#0c0f14" },
+            headerTintColor: "#fff",
           }}
         />
 

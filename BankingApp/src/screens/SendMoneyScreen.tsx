@@ -197,6 +197,26 @@ export default function SendMoneyScreen({ navigation }: any) {
 
   const insufficient = Number(amount) > (funds ?? 0) && mode === "send";
 
+  const validateInputs = () => {
+  const value = Number(amount);
+
+  if (!amount || value <= 0) {
+    setResultMsg("Enter a valid amount");
+    setResultColor("#ff3d3d");
+    setResultVisible(true);
+    return false;
+  }
+
+  if (!recipientCard || recipientCard.length !== 9) {
+    setResultMsg("Card number must be 9 digits");
+    setResultColor("#ff3d3d");
+    setResultVisible(true);
+    return false;
+  }
+
+  return true;
+};
+
   return (
     <View style={styles.container}>
 
@@ -244,9 +264,13 @@ export default function SendMoneyScreen({ navigation }: any) {
 
       <TouchableOpacity
         style={[styles.button, insufficient && mode==="send" && {opacity: 0.4}]}
-        onPress={() => setConfirmVisible(true)}
+        onPress={() => {
+          if (validateInputs()) setConfirmVisible(true);
+        }}
         disabled={insufficient && mode==="send"}
       >
+
+
         <Text style={styles.buttonText}>
           {mode === "send" ? "Send Money" : "Request Money"}
         </Text>
