@@ -1,26 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { ColorThemeContext } from "../theme/ColorThemeContext";
 
 export default function HomeScreen({ navigation }: any) {
   const [funds, setFunds] = useState<number | null>(null);
   const [cardnum, setCardnum] = useState("");
   const [fullName, setFullName] = useState("");
 
+
+  const { theme } = useContext(ColorThemeContext);
+const [displayFunds, setDisplayFunds] = useState(0);
+
+useEffect(() => {
+  if (funds !== null) {
+    let start = 0;
+    const end = Number(funds);
+    if (start === end) return;
+
+    const duration = 800; // ms
+    const stepTime = 16; // ~60fps
+    const step = (end - start) / (duration / stepTime);
+
+    const counter = setInterval(() => {
+      start += step;
+      if (start >= end) {
+        clearInterval(counter);
+        setDisplayFunds(end);
+      } else {
+        setDisplayFunds(Math.floor(start));
+      }
+    }, stepTime);
+
+    return () => clearInterval(counter);
+  }
+}, [funds]);
+
   useEffect(() => {
     loadUser();
   }, []);
 
   const loadUser = async () => {
-    const token = await AsyncStorage.getItem("token");
-    const res = await axios.get("http://10.0.2.2:3000/api/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axios.get("http://10.0.2.2:3000/api/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setFunds(res.data.funds);
-    setCardnum(res.data.cardnum);
-    setFullName(res.data.fullName);
+      setFunds(res.data.funds);
+      setCardnum(res.data.cardnum);
+      setFullName(res.data.fullName);
+    } catch (err) {
+      console.log("Error loading user:", err);
+    }
   };
 
   const logout = async () => {
@@ -32,107 +65,102 @@ export default function HomeScreen({ navigation }: any) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.greeting}>Hello, {fullName}</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.greeting, { color: theme.text }]}>
+        Hello, {fullName}
+      </Text>
 
-      {/* Big balance */}
-      <Text style={styles.balance}>${funds}</Text>
+      <Text style={[styles.balance, { color: theme.primary }]}>
+        ${funds !== null ? displayFunds.toLocaleString() : "..."}
+      </Text>
 
-      {/* Card number */}
-      <Text style={styles.card}>Card: {cardnum}</Text>
 
-      {/* Menu buttons */}
+      <Text style={[styles.card, { color: theme.text }]}>
+        Card: {cardnum}
+      </Text>
+
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
         onPress={() => navigation.navigate("SendMoney")}
       >
-        <Text style={styles.buttonText}>Send Money</Text>
+        <Text style={[styles.buttonText, { color: theme.text }]}>Send Money</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
         onPress={() => navigation.navigate("Spendings")}
       >
-        <Text style={styles.buttonText}>Spendings History</Text>
+        <Text style={[styles.buttonText, { color: theme.text }]}>Spendings History</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
         onPress={() => navigation.navigate("Simulation")}
       >
-        <Text style={styles.buttonText}>Simulation</Text>
+        <Text style={[styles.buttonText, { color: theme.text }]}>Simulation</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
         onPress={() => navigation.navigate("Options")}
       >
-        <Text style={styles.buttonText}>Options</Text>
+        <Text style={[styles.buttonText, { color: theme.text }]}>Options</Text>
       </TouchableOpacity>
 
-      {/* Logout button in its own box */}
-      <TouchableOpacity style={styles.logoutBox} onPress={logout}>
-        <Text style={styles.logoutText}>Logout</Text>
+      <TouchableOpacity
+        style={[styles.logoutBox, { borderColor: theme.danger, backgroundColor: theme.card }]}
+        onPress={logout}
+      >
+        <Text style={[styles.logoutText, { color: theme.danger }]}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-/* Styles */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0c0f14",
     paddingHorizontal: 20,
     paddingTop: 60,
     alignItems: "center",
   },
   greeting: {
-    color: "#fff",
     fontSize: 26,
     fontWeight: "700",
     marginBottom: 5,
     textAlign: "center",
   },
   balance: {
-    color: "#4caf50",
     fontSize: 40,
     fontWeight: "800",
     marginBottom: 5,
     textAlign: "center",
   },
   card: {
-    color: "#aaa",
     fontSize: 16,
     marginBottom: 30,
   },
   button: {
     width: "100%",
-    backgroundColor: "#1c1f26",
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#333",
   },
   buttonText: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "600",
   },
   logoutBox: {
     width: "100%",
-    backgroundColor: "#1c1f26",
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
     marginTop: 25,
     borderWidth: 1,
-    borderColor: "#ff3d3d",
   },
   logoutText: {
-    color: "#ff3d3d",
     fontSize: 16,
     fontWeight: "700",
   },
