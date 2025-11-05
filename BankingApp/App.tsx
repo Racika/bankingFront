@@ -39,7 +39,7 @@ function AppNavigator() {
           component={HomeScreen}
           options={{
             headerShown: true,
-            headerTitle: "Racika Banking Inc.",
+            headerTitle: "Simple, Effective, Rac.",
             headerTitleAlign: "center",
             headerStyle: { backgroundColor: theme.background },
             headerTintColor: theme.text,

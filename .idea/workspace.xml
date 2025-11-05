@@ -39,14 +39,16 @@
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/BankFront/BankingApp/assets"
+    "last_opened_file_path": "C:/BankFront/BankingApp/android/app/src/main/assets"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\BankFront\BankingApp\android\app\src\main\assets" />
       <recent name="C:\BankFront\BankingApp\assets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\BankFront\BankingApp\assets" />
       <recent name="C:\BankFront\BankingApp\android\app\src\main" />
       <recent name="C:\BankFront" />
     </key>
