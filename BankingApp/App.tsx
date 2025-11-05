@@ -10,6 +10,7 @@ import SimulationScreen from "./src/screens/SimulationScreen";
 import SendMoneyScreen from "./src/screens/SendMoneyScreen";
 import SpendingsScreen from "./src/screens/SpendingsScreen";
 import OptionsScreen from "./src/screens/OptionsScreen";
+import SavingsSettingsScreen from "./src/screens/SavingsSettingsScreen";
 
 import { ColorThemeProvider, ColorThemeContext } from "./src/theme/ColorThemeContext";
 
@@ -79,6 +80,18 @@ function AppNavigator() {
             headerTintColor: theme.text,
           }}
         />
+        <Stack.Screen
+          name="SavingsSettings"
+          component={SavingsSettingsScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "Savings",
+            headerStyle: { backgroundColor: "#0c0f14" },
+            headerTintColor: "#fff",
+            headerTitleAlign: "center",
+          }}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

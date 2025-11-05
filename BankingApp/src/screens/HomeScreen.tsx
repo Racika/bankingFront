@@ -12,14 +12,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { ColorThemeContext } from "../theme/ColorThemeContext";
 import LinearGradient from "react-native-linear-gradient";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }: any) {
   const [funds, setFunds] = useState<number | null>(null);
+  const [savings, setSavings] = useState<number | null>(null);
   const [cardnum, setCardnum] = useState("");
   const [fullName, setFullName] = useState("");
   const { theme } = useContext(ColorThemeContext);
   const [displayFunds, setDisplayFunds] = useState(0);
+  const [displaySavings, setDisplaySavings] = useState(0);
 
+  const isFocused = useIsFocused();
+
+  // Flip animation
   const flipAnim = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
 
@@ -38,16 +44,11 @@ export default function HomeScreen({ navigation }: any) {
     setFlipped(!flipped);
   };
 
-  const formatCardNumber = (num: string) => {
-    return num.replace(/\W/gi, "").replace(/(.{3})/g, "$1 ").trim();
-  };
-
+  // Animate Funds
   useEffect(() => {
     if (funds !== null) {
       let start = 0;
       const end = Number(funds);
-      if (start === end) return;
-
       const duration = 800;
       const stepTime = 16;
       const step = (end - start) / (duration / stepTime);
@@ -66,9 +67,35 @@ export default function HomeScreen({ navigation }: any) {
     }
   }, [funds]);
 
+  // Animate Savings
   useEffect(() => {
-    loadUser();
-  }, []);
+    if (savings !== null) {
+      let start = 0;
+      const end = Number(savings);
+      const duration = 800;
+      const stepTime = 16;
+      const step = (end - start) / (duration / stepTime);
+
+      const counter = setInterval(() => {
+        start += step;
+        if (start >= end) {
+          clearInterval(counter);
+          setDisplaySavings(end);
+        } else {
+          setDisplaySavings(Math.floor(start));
+        }
+      }, stepTime);
+
+      return () => clearInterval(counter);
+    }
+  }, [savings]);
+
+  // Load on screen focus
+  useEffect(() => {
+    if (isFocused) {
+      loadUser();
+    }
+  }, [isFocused]);
 
   const loadUser = async () => {
     try {
@@ -78,6 +105,7 @@ export default function HomeScreen({ navigation }: any) {
       });
 
       setFunds(res.data.funds);
+      setSavings(res.data.savings);
       setCardnum(res.data.cardnum);
       setFullName(res.data.fullName);
     } catch (err) {
@@ -96,45 +124,36 @@ export default function HomeScreen({ navigation }: any) {
       {/* CARD */}
       <Animated.View>
         <Pressable onPress={flipCard}>
-
           {/* FRONT */}
           <Animated.View
             style={[
               styles.cardContainer,
-              {
-                backgroundColor: theme.card,
-                borderColor: theme.primary,
-                transform: [{ rotateY: frontInterpolate }],
-              },
+              { backgroundColor: theme.card, borderColor: theme.primary, transform: [{ rotateY: frontInterpolate }] }
             ]}
           >
             <Image source={require("../../assets/card_texture.png")} style={styles.textureLayer} />
+
             <LinearGradient
-              colors={["rgba(255,255,255,0.35)", "rgba(255,255,255,0)"]}
+              colors={["rgba(255,255,255,0.4)", "rgba(255,255,255,0)"]}
               style={styles.glossLayer}
             />
 
-            {/* BANK NAME */}
-            <Text style={[styles.cardTitle, { color: theme.text }]}>Racika Banking Inc.</Text>
+            {/* Sigil */}
+            <Image source={require("../../assets/sigil.png")} style={styles.sigil} />
 
-            {/* BALANCE */}
+            <Text style={[styles.cardTitle, { color: theme.text }]}>Racika Bank inc</Text>
+
             <Text style={[styles.cardBalance, { color: theme.primary }]}>
-              ${funds !== null ? displayFunds.toLocaleString() : "…"}
+              ${displayFunds.toLocaleString()}
             </Text>
 
-            {/* CARD NUMBER */}
+            {/* Card num grouped in 4s */}
             <Text style={[styles.cardNumber, { color: theme.text }]}>
-              {formatCardNumber(cardnum)}
+              {cardnum.replace(/(.{3})/g, "$1 ").trim()}
+
             </Text>
 
-            {/* NAME */}
             <Text style={[styles.cardName, { color: theme.text }]}>{fullName}</Text>
-
-            {/* SIGIL bottom-right */}
-            <Image
-              source={require("../../assets/sigil.png")}
-              style={styles.sigil}
-            />
           </Animated.View>
 
           {/* BACK */}
@@ -142,63 +161,56 @@ export default function HomeScreen({ navigation }: any) {
             style={[
               styles.cardContainer,
               styles.cardBack,
-              {
-                backgroundColor: theme.card,
-                borderColor: theme.primary,
-                transform: [{ rotateY: backInterpolate }],
-              },
+              { backgroundColor: theme.card, borderColor: theme.primary, transform: [{ rotateY: backInterpolate }] }
             ]}
           >
             <Image source={require("../../assets/card_texture.png")} style={styles.textureLayer} />
             <LinearGradient
-              colors={["rgba(255,255,255,0.35)", "rgba(255,255,255,0)"]}
+              colors={["rgba(255,255,255,0.4)", "rgba(255,255,255,0)"]}
               style={styles.glossLayer}
             />
 
             <Text style={[styles.cardTitle, { color: theme.text }]}>Savings</Text>
+
             <Text style={[styles.cardBalance, { color: theme.primary }]}>
-              Coming Soon
+              ${displaySavings.toLocaleString()}
             </Text>
             <Text style={[styles.cardName, { color: theme.text }]}>
-              Secure vault enabled
-            </Text>
+                          Growing securely
+                        </Text>
+
+            {/* Cog button */}
+            <TouchableOpacity
+              style={styles.cogButton}
+              onPress={(e) => {
+                e.stopPropagation();
+                navigation.navigate("SavingsSettings");
+              }}
+            >
+              <Image source={require("../../assets/cog.png")} style={styles.cogIcon} />
+            </TouchableOpacity>
           </Animated.View>
         </Pressable>
       </Animated.View>
 
-      {/* BUTTONS */}
-      <TouchableOpacity
-        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
-        onPress={() => navigation.navigate("SendMoney")}
-      >
+      {/* Buttons */}
+      <TouchableOpacity style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]} onPress={() => navigation.navigate("SendMoney")}>
         <Text style={[styles.buttonText, { color: theme.text }]}>Send Money</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
-        onPress={() => navigation.navigate("Spendings")}
-      >
+      <TouchableOpacity style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]} onPress={() => navigation.navigate("Spendings")}>
         <Text style={[styles.buttonText, { color: theme.text }]}>Spendings History</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
-        onPress={() => navigation.navigate("Simulation")}
-      >
+      <TouchableOpacity style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]} onPress={() => navigation.navigate("Simulation")}>
         <Text style={[styles.buttonText, { color: theme.text }]}>Simulation</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]}
-        onPress={() => navigation.navigate("Options")}
-      >
+      <TouchableOpacity style={[styles.button, { borderColor: theme.primary, backgroundColor: theme.card }]} onPress={() => navigation.navigate("Options")}>
         <Text style={[styles.buttonText, { color: theme.text }]}>Options</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.logoutBox, { borderColor: theme.danger, backgroundColor: theme.card }]}
-        onPress={logout}
-      >
+      <TouchableOpacity style={[styles.logoutBox, { borderColor: theme.danger, backgroundColor: theme.card }]} onPress={logout}>
         <Text style={[styles.logoutText, { color: theme.danger }]}>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -209,92 +221,65 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 40, alignItems: "center" },
 
   cardContainer: {
-    width: 330,
-    height: 200,
-    borderRadius: 18,
-    borderWidth: 1.5,
-    justifyContent: "flex-end",
-    padding: 20,
-    marginBottom: 30,
+    width: 330, height: 200,
+    borderRadius: 18, borderWidth: 1.5,
+    justifyContent: "center",
+    padding: 20, marginBottom: 30,
     backfaceVisibility: "hidden",
     overflow: "hidden",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
+    elevation: 8, shadowColor: "#000", shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 4 }, shadowRadius: 10,
   },
 
   cardBack: { position: "absolute", top: 0 },
 
-  textureLayer: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.18,
-    resizeMode: "cover",
-  },
-
-  glossLayer: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.25,
-    transform: [{ rotate: "-20deg" }],
-  },
-
   sigil: {
-    width: 60,
-    height: 60,
+    width: 50, height: 50,
     resizeMode: "contain",
-    position: "absolute",
-    bottom: 12,
-    right: 12,
-    opacity: 0.75,
+    position: "absolute", top: 12, right: 12, opacity: 0.9,
   },
+
+cogButton: {
+  position: "absolute",
+  bottom: 12,
+  right: 12,
+  padding: 16,
+  zIndex: 999,
+},
+
+cogIcon: {
+  width: 48,
+  height: 48,
+
+},
+
+
+  textureLayer: { ...StyleSheet.absoluteFillObject, opacity: 0.20, resizeMode: "cover" },
+  glossLayer: { ...StyleSheet.absoluteFillObject, opacity: 0.25, transform: [{ rotate: "-20deg" }] },
 
   cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    fontFamily: "Montserrat-Bold",
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-
-  cardBalance: {
-    fontSize: 34,
-    fontWeight: "800",
-    marginBottom: 12,
-  },
-
-  cardNumber: {
-    fontSize: 18,
-    fontWeight: "600",
-    opacity: 0.85,
+    fontSize: 20,
+    fontWeight: "900",
     letterSpacing: 2,
-    marginBottom: 6,
+    textTransform: "uppercase",
+    marginBottom: 8,
+    fontFamily: "",
   },
 
-  cardName: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  cardBalance: { fontSize: 34, fontWeight: "800", marginBottom: 12 },
+  cardNumber: { fontSize: 19, fontWeight: "800", opacity: 0.8 },
+  cardName: { fontSize: 16, fontWeight: "700", marginTop: 8 },
 
   button: {
-    width: "100%",
-    paddingVertical: 15,
-    borderRadius: 12,
-    alignItems: "center",
-    marginBottom: 12,
-    borderWidth: 1,
+    width: "100%", paddingVertical: 16, borderRadius: 12,
+    alignItems: "center", marginBottom: 12, borderWidth: 1,
+  },
+
+  logoutBox: {
+    width: "100%", paddingVertical: 14, borderRadius: 12,
+    alignItems: "center", marginTop: 25, borderWidth: 1,
   },
 
   buttonText: { fontSize: 18, fontWeight: "600" },
-
-  logoutBox: {
-    width: "100%",
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 25,
-    borderWidth: 1,
-  },
-
   logoutText: { fontSize: 16, fontWeight: "700" },
 });
