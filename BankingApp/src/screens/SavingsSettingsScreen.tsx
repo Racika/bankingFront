@@ -41,7 +41,7 @@ export default function SavingsSettingsScreen() {
   const loadUserData = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axios.get("http://10.0.2.2:3000/api/me", {
+      const res = await axios.get("https://racika-banking-api.onrender.com/api/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -58,7 +58,7 @@ export default function SavingsSettingsScreen() {
       const token = await AsyncStorage.getItem("token");
 
       const res = await axios.post(
-        "http://10.0.2.2:3000/api/getSavingsSettings",
+        "https://racika-banking-api.onrender.com/api/getSavingsSettings",
         { userId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -76,7 +76,7 @@ export default function SavingsSettingsScreen() {
       const token = await AsyncStorage.getItem("token");
 
       const res = await axios.post(
-        "http://10.0.2.2:3000/api/getSavingsTransactions",
+        "https://racika-banking-api.onrender.com/api/getSavingsTransactions",
         { userId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -94,7 +94,7 @@ export default function SavingsSettingsScreen() {
     const userId = await getUserId();
 
     await axios.post(
-      "http://10.0.2.2:3000/api/updateSavingsSettings",
+      "https://racika-banking-api.onrender.com/api/updateSavingsSettings",
       { userId, round_up_enabled: value, goal },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -107,7 +107,7 @@ export default function SavingsSettingsScreen() {
     const userId = await getUserId();
 
     await axios.post(
-      "http://10.0.2.2:3000/api/updateSavingsSettings",
+      "https://racika-banking-api.onrender.com/api/updateSavingsSettings",
       { userId, round_up_enabled: roundUpEnabled, goal: v },
       { headers: { Authorization: `Bearer ${token}` } }
     );

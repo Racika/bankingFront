@@ -7,7 +7,7 @@ export default function LoginScreen({ navigation }: any) {
   const [password, setPassword] = useState("");
 
   const login = async () => {
-    const res = await fetch("http://10.0.2.2:3000/api/login", {
+    const res = await fetch("https://racika-banking-api.onrender.com/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })

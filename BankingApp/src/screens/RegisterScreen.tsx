@@ -16,7 +16,7 @@ export default function RegisterScreen({ navigation }: any) {
     }
 
     try {
-      const res = await fetch("http://10.0.2.2:3000/api/users", {
+      const res = await fetch("https://racika-banking-api.onrender.com/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, fullName: nickname, password })

@@ -100,7 +100,7 @@ export default function HomeScreen({ navigation }: any) {
   const loadUser = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axios.get("http://10.0.2.2:3000/api/me", {
+      const res = await axios.get("https://racika-banking-api.onrender.com/api/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

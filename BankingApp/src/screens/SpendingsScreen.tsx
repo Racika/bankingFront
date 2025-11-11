@@ -43,11 +43,11 @@ export default function SpendingsScreen() {
       if (!userId || !token) return;
 
       const [spendRes, earnRes] = await Promise.all([
-        axios.post("http://10.0.2.2:3000/api/spendings",
+        axios.post("https://racika-banking-api.onrender.com/api/spendings",
           { userId, month: selectedMonth },
           { headers: { Authorization: `Bearer ${token}` } }
         ),
-        axios.post("http://10.0.2.2:3000/api/earnings",
+        axios.post("https://racika-banking-api.onrender.com/api/earnings",
           { userId, month: selectedMonth },
           { headers: { Authorization: `Bearer ${token}` } }
         )

@@ -25,7 +25,7 @@ export default function OptionsScreen({ navigation }: any) {
 
   const loadUser = async () => {
     const token = await AsyncStorage.getItem("token");
-    const res = await axios.get("http://10.0.2.2:3000/api/me", {
+    const res = await axios.get("https://racika-banking-api.onrender.com/api/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -39,7 +39,7 @@ export default function OptionsScreen({ navigation }: any) {
   const loadRequests = async (card: string) => {
     const token = await AsyncStorage.getItem("token");
     const res = await axios.post(
-      "http://10.0.2.2:3000/api/getRequests",
+      "https://racika-banking-api.onrender.com/api/getRequests",
       { cardnum: card },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -75,7 +75,7 @@ export default function OptionsScreen({ navigation }: any) {
       const month = new Date().toLocaleString("en-US", { month: "long" });
 
       const res = await axios.post(
-        "http://10.0.2.2:3000/api/spendings",
+        "https://racika-banking-api.onrender.com/api/spendings",
         { userId, month },
         { headers: { Authorization: `Bearer ${token}` } }
       );
