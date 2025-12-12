@@ -96,7 +96,7 @@ export default function OptionsScreen({ navigation }: any) {
         .map((x: any) => `<tr><td>${x.day}</td><td>${x.category}</td><td>$${x.amount}</td></tr>`)
         .join("");
 
-      // ✅ Load bank sigil from Android assets folder
+
       const base64Image = await RNFS.readFileAssets("sigil.png", "base64");
 
       const watermarkStyle = `

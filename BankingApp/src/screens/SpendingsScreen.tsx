@@ -154,7 +154,7 @@ return (
 
     <Text style={[styles.listTitle, { color: theme.text }]}>Transactions</Text>
 
-    {/* ✅ Scroll fix — Now always scrollable */}
+
     <View style={{ flex: 1 }}>
       <FlatList
         data={transactions}
